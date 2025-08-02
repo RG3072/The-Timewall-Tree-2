@@ -13,12 +13,20 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1.2",
-	name: "two walls II",
+	num: "0.2.3",
+	name: "to the 1e308",
 }
 
 
 let changelog = `
+    <h4>v0.2.3 (250727) -to the 1e308-</h4>
+		- add wp2 and reach inf points.<br>
+    <h4>v0.2.2 (250721) -a sub-currency-</h4>
+		- add wp and related upgs.<br>
+    <h4>v0.2.1 (250713) -there are milestones-</h4>
+		- add milestones and qols.<br>
+    <h4>v0.2 (250710) -next reset-</h4>
+		- 3rd layer,triwall.<br>
     <h4>v0.1.2 (250523) -two walls II-</h4>
 		- still more challenges and upgrades.<br>
     <h4>v0.1.1 (250521) -two walls-</h4>
@@ -60,10 +68,18 @@ function getPointGen() {
 	if(upg('t',23)) a=a.mul(uef('t',23))
 	if(upg('t',25)) a=a.mul(uef('t',25))        
 	if(ch('t',11)) a=a.mul(2)
-	if(upg('bt',11)) a=a.mul(2)
+	if(upg('bt',11)) a=a.mul(2)	
 	if(upg('bt',21)&&!inc('bt',21)) a=a.mul(uef('bt',21))	
 	if(upg('t',44)) a=a.mul(uef('t',44))
 	if(upg('t',45)&&inc('t',13)) a=a.mul(bef('t',14))
+	if(mil('tt',2)) a=a.mul(player.tt.total.max(1).pow(0.5))
+	if(upg('tt',11)) a=a.mul(2)
+	if(upg('tt',12)) a=a.mul(5)	
+	if(upg('tt',34)) a=a.mul(bef('tt',11))	
+	if(mil('tt',9)) a=a.mul(100)	
+	if(upg('tt',13)) a=a.pow(1.001)
+	if(upg('tt',14)) a=a.pow(1.002)
+	if(upg('tt',15)) a=a.pow(1.002)
 	if(upg('t',24)) a=a.pow(1.01)
 	if(upg('t',31)) a=a.pow(1.01)
 	if(inc('t',11)) a=a.pow(0.5)
@@ -79,12 +95,12 @@ function addedPlayerData() { return {
 // Display extra things at the top of the page
 var displayThings = [
 	function() {
-		let s='current endgame:1e12 biwall.<br>new layer at 1e12 and coming soon!<br> Inspired by The timewall tree by DeFe308'
+		let s='current endgame:1e308 points.<br>new layer at 1e308 and coming soon!<br> Inspired by The timewall tree by DeFe308'
 		return s},//<br> points is hardcapped at 1F100.
 ]
 // Determines when the game "ends"
 function isEndgame() {
-	return player.bt.total.gte(1e12)
+	return player.bt.total.gte('1e308')
 }
 
 //<br> bilibili: @bili_50929957100

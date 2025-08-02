@@ -12,6 +12,7 @@ addLayer("t", {
         if(ch('t',12)&&!inc('t',13)) p=p.mul(bef('t',13))
         if(upg('bt',13)) p=p.mul(2)
         if(ch('bt',13)) p=p.mul(cef('bt',13))
+        if(mil('tt',1)) p=p.mul(2)
         if(inc('bt',13)) p=n(0)
         return p},
     color: "#4BDC13",
@@ -28,7 +29,7 @@ addLayer("t", {
     },
     row: 1, 
     hotkeys: [
-        {key: "a", description: "T:timewall", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        {key: "a", description: "A:timewall", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
     layerShown(){return true},
     gainMult() {
@@ -44,6 +45,9 @@ addLayer("t", {
         if(upg('bt',22)&&!inc('bt',21)) a=a.mul(uef('bt',22))
         if(inc('bt',11)) a=a.mul(0.2).add(0.8)
         if(ch('t',13)) a=a.mul(cef('t',13))
+        if(mil('tt',1)) a=a.mul(2)        
+        if(mil('tt',8)) a=a.mul(10)        
+        if(upg('tt',61)) a=a.mul(10)
         if(inc('bt',12)) a=a.pow(tmp.bt.challenges[12].exp)
         return a
     },
@@ -55,7 +59,17 @@ addLayer("t", {
             if(ac('ac',17)) keep.push('challenges')
             if(ch('bt',11)) keep.push('upgrades')
             layerDataReset(this.layer,keep)}
-    },
+        if (layer=='tt') {        
+            let keep=[]            
+            if(mil('tt',7)) keep.push('upgrades')            
+            layerDataReset(this.layer,keep)
+            if(ac('ac',37)) player.t.challenges[11]=1,player.t.challenges[12]=1
+            if(upg('tt',42)) player.t.challenges[13]=10
+            if(upg('tt',51)) player.t.challenges[13]=25
+            if(mil('tt',10)) player.t.challenges[13]=player.t.challenges[13].min(bef('tt',13).add(25))
+        }
+    },   
+    autoUpgrade() {return (mil('tt',4))},//&&!gcs('?',145)
     // microtabs: {
     //     stuff: {       
     //         "Upgrades": {
@@ -251,6 +265,12 @@ addLayer("t", {
             unlocked() {return (upg(this.layer,45))},
         },
     },
+    automate(){
+        if (mil('tt',1)) buyBuyable('t',13)
+        if (mil('tt',2)) buyBuyable('t',11)
+        if (mil('tt',3)) buyBuyable('t',12)        
+        if (mil('tt',6)) buyBuyable('t',14)
+    },
     buyables:{
         11: {
             title: function(){
@@ -267,21 +287,26 @@ addLayer("t", {
                 return c
             },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
-            // bulk() { 
-            //     let tar=tmp.B.bulk
-            //     let c = this.cost(gba(this.layer, this.id).add(tar))
-            //     if (player[this.layer].points.gte(c)&&player.B.auto) player.B.buyables[this.id] = player.B.buyables[this.id].add(tar)},
             buy() {
-                player[this.layer].points = player[this.layer].points.sub(this.cost())//if (!mil('B',0)) 
+                if(!mil('tt',3)) player[this.layer].points = player[this.layer].points.sub(this.cost()) 
                 setBuyableAmount(this.layer, this.id, gba(this.layer, this.id).add(1))},
+            bulk() { 
+                let t=gba(this.layer,this.id)
+                if(upg('tt',54)) t=player.t.points.max(1).log10().mul(9).pow(1/1.67).mul(2).add(49).ceil().max(gba(this.layer,this.id))
+                let c=this.cost(t)
+                if(player.t.points.gte(c)) sba(this.layer,this.id,t)},
             base(){   let b=n(1.1)
+                if(mil('tt',2)) b=b.add(0.01)                
+                if(upg('tt',21)) b=b.add(0.01)
                 if(upg('bt',14)&&!inc('bt',21)) b=b.add(bef('bt',11))
+                if(upg('tt',63)) b=b.add(uef('tt',63))
                 if(ac('ac',33)) b=b.mul(1.01)
                 return b},
             effect(x) { 
                 let e=n(1)
                 if(inc('t',12)) e=n(0.5)
                 let ef=this.base().pow(x.pow(e))
+                if(upg('tt',55)) ef=this.base().pow(x.add(tmp.tt.mwpef[0]).pow(e))
                 return ef},
             display() { 
                 return "points gain x"+ format(this.base()) + " \n\
@@ -307,14 +332,22 @@ addLayer("t", {
             },
             canAfford() { return player.points.gte(this.cost()) },
             buy() {
-                player.points = player.points.sub(this.cost())//if (!mil('B',0)) 
+                if(!mil('tt',3)) player.points = player.points.sub(this.cost())
                 setBuyableAmount(this.layer,this.id,gba(this.layer, this.id).add(1))},
-            base(){   let b=n(1.1)
+            bulk() { 
+                let t=gba(this.layer,this.id)
+                if(upg('tt',54)) t=player.points.max(1).log10().mul(30).pow(25/48).sub(1).ceil().max(gba(this.layer,this.id))
+                let c=this.cost(t)
+                if(player.points.gte(c)) sba(this.layer,this.id,t)},
+            base(){   let b=n(1.1)               
+                if(mil('tt',3)) b=b.add(0.01)
+                if(upg('tt',22)) b=b.add(0.01)
                 if(upg('bt',15)&&!inc('bt',21)) b=b.add(bef('bt',12))
                 if(ac('ac',33)) b=b.mul(1.01)
                 return b},
             effect(x) { 
                 let ef=this.base().pow(x)
+                if(upg('tt',55)) ef=this.base().pow(x.add(tmp.tt.mwpef[0]))
                 return ef},
             display() { 
                 return "timewall gain x"+ format(this.base()) + " \n\
@@ -331,15 +364,19 @@ addLayer("t", {
             },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
             buy() {
-                player[this.layer].points = player[this.layer].points.sub(this.cost())//if (!mil('B',0)) 
-                setBuyableAmount(this.layer, this.id, gba(this.layer, this.id).add(1))},
-            // base(){   let b=n(1.1)
-            //     return b},
+                if(!mil('tt',1)) player[this.layer].points=player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer,this.id,gba(this.layer,this.id).add(1))},
+            bulk() { 
+                let t=gba(this.layer,this.id)
+                if(upg('tt',52)) t=player.t.points.div(100).max(1).log10().mul(5).sub(1).ceil().max(gba(this.layer,this.id))
+                let c=this.cost(t)
+                if(player.t.points.gte(c)) sba(this.layer,this.id,t)},
             effect(x) { 
                 let e=n(0.95)
                 if(ac('ac',27)) e=n(1.01)
                 if(upg('bt',34)) e=e.add(0.01)
                 let ef=x.pow(e).add(1)
+                if(upg('tt',23)) ef=ef.mul(n(1.01).pow(gba(this.layer,this.id)))
                 return ef},
             display() { 
                 return "timewall passive mul +1 \n\
@@ -354,11 +391,17 @@ addLayer("t", {
                 let c=n(10).pow(x.pow(1.05).add(18))
                 return c
             },
-            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            canAfford() {return player[this.layer].points.gte(this.cost()) },
             buy() {
-                player[this.layer].points=player[this.layer].points.sub(this.cost())//if (!mil('B',0)) 
+                if(!mil('tt',6)) player[this.layer].points=player[this.layer].points.sub(this.cost()) 
                 setBuyableAmount(this.layer,this.id,gba(this.layer, this.id).add(1))},
+            bulk() { 
+                let t=gba(this.layer,this.id)
+                if(upg('tt',52)) t=player.t.points.max(1).log10().sub(18).pow(20/21).sub(1).ceil().max(gba(this.layer,this.id))
+                let c=this.cost(t)
+                if(player.t.points.gte(c)) sba(this.layer,this.id,t)},
             base(){   let b=n(1.05)
+                if(ac('ac',36)) b=b.add(0.01)
                 return b},
             effect(x) { 
                 let e=n(1)
@@ -394,7 +437,8 @@ addLayer("t", {
         13: {
             name: function(){
                 let s=''
-                if(ccomp(this.layer,this.id).gte(10)) s='sc|'
+                if(ccomp(this.layer,this.id).gte(10)) s='sc|'                
+                if(ccomp(this.layer,this.id).gte(25)) s='sc2|'
                 s=s+'tc3'
                 return s
             },
@@ -404,7 +448,8 @@ addLayer("t", {
             goalDescription:  function() {return format(this.goal())+' points'},
             goal(){
                 let ef=n(10).pow(ccomp(this.layer,this.id).pow(1.05).mul(0.7).add(5))
-                if(ccomp(this.layer,this.id).gte(10)) ef=n(10).pow(ccomp(this.layer,this.id).pow(1.44).div(2))
+                if(ccomp(this.layer,this.id).gte(10)) ef=n(10).pow(ccomp(this.layer,this.id).pow(1.44).div(2))               
+                if(ccomp(this.layer,this.id).gte(25)) ef=n(10).pow(ccomp(this.layer,this.id).pow(2.5).div(60))
                 return ef
             },   
             canComplete() {return player.points.gte(this.goal())},
@@ -414,6 +459,7 @@ addLayer("t", {
                 let e=n(0.5)
                 if(upg('bt',25)) e=e.add(ccomp(this.layer,this.id).pow(0.6).div(100))
                 let ef=n(10).pow(player.t.points.add(10).log(10).pow(e)).pow(b.div(20))
+                if(upg('tt',32)) ef=ef.pow(1.01)
                 return ef
             },
             rewardDisplay() {return format(this.rewardEffect())+"x"},

@@ -9,6 +9,7 @@ addLayer("bt", {
     passiveGeneration(){
         let p=n(0)
         if(upg('bt',35)) p=uef('bt',35)
+        if(mil('tt',1)) p=p.mul(2)
         return p},
     color: "#D1FF76",
     requires: n(1e4), 
@@ -19,7 +20,8 @@ addLayer("bt", {
     exponent: n(0.3),
     gainExp() {
         let a=n(1)
-        if(upg('bt',36)) a=a.add(0.01)
+        if(upg('bt',36)) a=a.add(0.01)                    
+        if(mil('tt',3)) a=a.add(0.01)
         return a
     },
     row: 2, 
@@ -30,15 +32,28 @@ addLayer("bt", {
     gainMult() {
         a=n(1)
         if(ac('ac',23)) a=a.mul(1.5)
+        if(mil('tt',2)) a=a.mul(2)
         if(upg('bt',24)&&!inc('bt',21)) a=a.mul(uef('bt',24))
         if(ch('bt',12)) a=a.mul(cef('bt',12))
+        if(upg('tt',61)) a=a.mul(10)
+        if(upg('tt',62)) a=a.mul(uef('tt',62))
         return a
     },
     softcap(){return n(Infinity)},
 	softcapPower(){return n(1)},
     branches: ['t'],
     // doReset(layer){
-
+    doReset(layer){
+        if (layer=='tt') {        
+            let keep=[]
+            layerDataReset(this.layer,keep)
+            if(ac('ac',37)) player.bt.challenges[11]=1,player.bt.challenges[21]=1
+            if(upg('tt',41)) player.bt.challenges[13]=10
+            if(upg('tt',42)) player.bt.challenges[12]=10            
+            if(mil('tt',8)) player.bt.challenges[12]=20,player.bt.challenges[13]=20
+        }
+    },    
+    autoUpgrade() {return (mil('tt',4))},//&&!gcs('?',145)
     // },
     // tabFormat: [
     //     "main-display",
@@ -165,6 +180,7 @@ addLayer("bt", {
             cost:n(1e7),
             effect()  { 
                 let ef=player.points.add(10).log(10).pow(0.66).div(4096)
+                if(upg('tt',24)) ef=player.points.add(10).log(10).pow(0.75).div(4000)
                 return ef;          
             },
             effectDisplay() { return format(this.effect())+"x" }, 
@@ -176,6 +192,10 @@ addLayer("bt", {
             cost:n(3e10),
             unlocked() {return (upg(this.layer,35))},
         },
+    },
+    automate(){
+        if (mil('tt',8)) buyBuyable('bt',11),buyBuyable('bt',12)  
+        if (upg('tt',52)) buyBuyable('bt',13)      
     },
     buyables:{
         11: {
@@ -192,7 +212,7 @@ addLayer("bt", {
             },
             canAfford() { return player.points.gte(this.cost()) },
             buy() {
-                player.points = player.points.sub(this.cost())//if (!mil('B',0)) 
+                if(!upg('tt',54)) player.points = player.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, gba(this.layer, this.id).add(1))},
             base(){   let b=n(0.01)
                 return b},
@@ -221,7 +241,7 @@ addLayer("bt", {
             },
             canAfford() { return player.points.gte(this.cost()) },
             buy() {
-                player.points = player.points.sub(this.cost())//if (!mil('B',0)) 
+                if(!upg('tt',54)) player.points = player.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, gba(this.layer, this.id).add(1))},
             base(){   let b=n(0.01)
                 return b},
@@ -247,10 +267,16 @@ addLayer("bt", {
                 let c=n(2).pow(x.pow(1.2)).mul(1e4)
                 return c
             },
+            purchaseLimit(){return n(30)},
             canAfford() { return player.bt.points.gte(this.cost()) },
             buy() {
-                player.bt.points=player.bt.points.sub(this.cost())//if (!mil('B',0)) 
+                if(!upg('tt',54)) player.bt.points=player.bt.points.sub(this.cost()) 
                 setBuyableAmount(this.layer,this.id,gba(this.layer, this.id).add(1))},
+            bulk() { 
+                let t=gba(this.layer,this.id)
+                if(upg('tt',52)) t=player.bt.points.div(1e4).max(1).logBase(2).pow(5/6).sub(1).ceil().max(gba(this.layer,this.id)).min(this.purchaseLimit())
+                let c=this.cost(t)
+                if(player.bt.points.gte(c)) sba(this.layer,this.id,t)},
             base(){   let b=n(0.01)
                 return b},
             effect(x) { 
@@ -270,18 +296,25 @@ addLayer("bt", {
             completionLimit: 1,
             challengeDescription() {return "just wall.<br>points and timewall /5."},
             unlocked() { return (upg('bt',16))},
-            goalDescription: '4096 timewall',
-            canComplete() {return player.t.points.gte(4096)},
+            goal(){return n(4096)}, 
+            goalDescription:  function() {return format(this.goal())+' timewall'},
+            canComplete() {return player.t.points.gte(this.goal())},
             rewardDescription: "x2 timewall and keep upgrades on biwall reset.",
         },
         12: {
-            name: "2tc2",
+            name: function(){
+                let s=''
+                if(ccomp(this.layer,this.id).gte(10)) s='sc|'
+                s=s+'2tc2'
+                return s
+            },
             completionLimit: 20,
             challengeDescription() {return "just wall?<br>points and timewall ^0.2.<br>comps:"+format(ccomp(this.layer,this.id))+'/20'},
             unlocked() { return (upg('bt',31))},
             goalDescription:  function() {return format(this.goal())+' timewall'},
             goal(){
-                let ef=n(10).pow(ccomp(this.layer,this.id).pow(1.05).div(3.5)).mul(1000)
+                let ef=n(10).pow(ccomp(this.layer,this.id).pow(1.05).div(3.5)).mul(1000)                
+                if(ccomp(this.layer,this.id).gte(10)) ef=n(10).pow(ccomp(this.layer,this.id).pow(1.5).div(5))
                 return ef
             },  
             exp(){
@@ -294,6 +327,7 @@ addLayer("bt", {
             rewardEffect() {
                 let b=ccomp(this.layer,this.id).pow(0.98)
                 let ef=n(1.1).pow(b)
+                if(upg('tt',33)) ef=ef.pow(1.25)
                 return ef
             },
             rewardDisplay() {return format(this.rewardEffect())+"x"},
@@ -327,8 +361,9 @@ addLayer("bt", {
             completionLimit: 1,
             challengeDescription() {return "it's time for next wall.<br>disable 2t21/22/24 and biwall buyables."},
             unlocked() { return (upg('bt',36))},
-            goalDescription: '123456789 timewall',
-            canComplete() {return player.t.points.gte(123456789)},
+            goal(){return n(123456789)}, 
+            goalDescription:  function() {return format(this.goal())+' timewall'},
+            canComplete() {return player.t.points.gte(this.goal())},
             rewardDescription: "unlock the next layer.",
         },
     }

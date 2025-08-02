@@ -97,7 +97,7 @@ addLayer("ac", {
             textStyle: {'color': '#E55846'},
         },
         31: {
-            name: "15.mega reset",
+            name: "15.mega R-G",
             done() {return player.bt.points.gte(1e6)}, 
             tooltip: "reach 1e6 biwall", 
             textStyle: {'color': '#EAFF7C'},
@@ -114,9 +114,57 @@ addLayer("ac", {
             tooltip: "complete 2bt4.<br>R:t-p/p-t base x1.01.",
             textStyle: {'color': '#9DCB94'},
         },
+        34: {
+            name: "18.small reset",
+            done() {return player.tt.total.gte(1)}, 
+            tooltip: "reach 1 triwall", 
+            textStyle: {'color': '#EAFF7C'},
+        },
+        35: {
+            name: "19.slow qol",
+            done() {return player.tt.total.gte(5)}, 
+            tooltip: "reach 5 triwall", 
+            textStyle: {'color': '#EAFF7C'},
+        },
+        36: {
+            name: "20.PresBoost",
+            done() {return ccomp('bt',13).gte(10)}, 
+            tooltip: "complete 2bt3 10 times.<br>R:'for c3' in T base +0.01.",
+            textStyle: {'color': '#9DCB94'},
+        },
+        37: {
+            name: "21.it's immense",
+            done() {return player.points.gte(1e80)}, 
+            tooltip: "reach 1e80 points.<br>R:keep tc1-2 and 2tc1/4 on triwall.",
+            textStyle: {'color': '#E55846'},
+        },
+        41: {
+            name: "22.2-scaling",
+            done() {return ccomp('t',13).gte(25)}, 
+            tooltip: "complete tc3 25 times.",
+            textStyle: {'color': '#EAFF7C'},
+        },
+        42: {
+            name: "23.skipped layer",
+            done() {return player.points.gte(1e50)&&!player.bt.total.gte(1)}, 
+            tooltip: "reach 1e50 points with no BT.<br>R:^1.01 TT.",
+            textStyle: {'color': '#9DCB94'},
+        },
+        43: {
+            name: "24.root^^",
+            done() {return n(tmp.t.resetGain).gte(1e50)&&inc('bt',12)}, 
+            tooltip: "reach 1e50 timewall gain in 2tc2.<br>R:wp exp +0.01.",
+            textStyle: {'color': '#9DCB94'},
+        },
+        44: {
+            name: "25.dim_2",
+            done() {return player.ttmultiwp[0].gte(1e5)}, 
+            tooltip: "reach 1e5 wp2.",
+            textStyle: {'color': '#EAFF7C'},
+        },
     },
     tabFormat: ["blank", ["display-text", function() {
-        return "<h3 style='color: yellow;'>Achievements: " + player.ac.achievements.length + "/10 </h4>"
+        return "<h3 style='color: yellow;'>Achievements: " + player.ac.achievements.length + "/25 </h4>"
     }
     ], "blank", "blank", "achievements", ],
 },

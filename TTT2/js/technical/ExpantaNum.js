@@ -11,6 +11,10 @@ function scs(a,b,c) {
   return setClickableState(a,b,c)
 }
 
+function sba(a,b,c) {
+  return setBuyableAmount(a,b,c)
+}
+
 function gba(a,b) {
   return getBuyableAmount(a,b)
 }
